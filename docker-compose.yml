@@ -1,0 +1,45 @@
+services:
+  laravelnew-database:
+    image: mariadb
+    restart: unless-stopped
+    container_name: laravelnew-database
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - laravelnew-network
+      - npm
+
+  laravelnew-website:
+    container_name: laravelnew-website
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./website:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    networks:
+      - laravelnew-network
+      - npm
+    user: '1000:1000' #on my pc
+    ports:
+      - 5173:5173
+    depends_on:
+      - laravelnew-database
+
+volumes:
+  db-data:
+  node_modules:
+networks:
+  laravelnew-network:
+    driver: bridge
+  npm:
+    external: true
+    name: npm
