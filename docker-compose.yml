@@ -17,7 +17,7 @@ services:
       - npm
 
   laraveladmin-phpmyadmin:
-    container_name: laravel-admin
+    container_name: laraveladmin-phpmyadmin
     image: phpmyadmin
     restart: always
     environment:
