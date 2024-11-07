@@ -1,8 +1,8 @@
 services:
-  laravelnew-database:
+  laraveladmin-database:
     image: mariadb
-    restart: unless-stopped
-    container_name: laravelnew-database
+    restart: always
+    container_name: laraveladmin-database
     env_file:
       - .env
     environment:
@@ -13,32 +13,44 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - laravelnew-network
+      - laraveladmin-network
       - npm
 
-  laravelnew-website:
-    container_name: laravelnew-website
+  laraveladmin-phpmyadmin:
+    container_name: laravel-admin
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=laraveladmin-database
+    networks:
+      - laraveladmin-network
+      - npm
+    depends_on:
+      - laraveladmin-database
+
+  laraveladmin-website:
+    container_name: laraveladmin-website
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./website:/var/www/html
       - node_modules:/var/www/html/node_modules
     networks:
-      - laravelnew-network
+      - laraveladmin-network
       - npm
-    user: '1000:1000' #on my pc
+    # user: "1000:1000" #on my pc
     ports:
       - 5173:5173
     depends_on:
-      - laravelnew-database
+      - laraveladmin-database
 
 volumes:
   db-data:
   node_modules:
 networks:
-  laravelnew-network:
+  laraveladmin-network:
     driver: bridge
   npm:
     external: true
